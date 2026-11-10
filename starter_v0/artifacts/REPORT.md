@@ -42,6 +42,11 @@ Research agent của em có thể tìm tin trên web hoặc mạng xã hội, đ
 4. `Kiểm tra sơ bộ nguồn này có dấu hiệu gì cần lưu ý: https://arxiv.org/abs/1706.03762`
 5. `Tìm 3 paper arXiv về RAG`
 
+## A4. Link dùng thử
+
+- Streamlit: https://ngohuyhoang-research-agent.streamlit.app
+- Source code: https://github.com/HuyHoangg10/K5-L3A-DAY03-NgoHuyHoang-ResearchAgentToolEval
+
 ---
 
 # PHẦN B — Chi tiết / Bằng chứng
@@ -98,7 +103,7 @@ Research agent của em có thể tìm tin trên web hoặc mạng xã hội, đ
 |---|---|---|---|
 | send (Telegram) | transcript v4, turn 5 | agent gọi `clarify` trước khi gửi | chưa cấu hình bot; không có tin nhắn thật được gửi |
 | arXiv/company policy | transcript v4 + group run G03 | đọc được paper và route đúng policy nội bộ | nội dung từ nguồn ngoài vẫn phải coi là untrusted text |
-| UI | `app.py` | Streamlit khởi động local thành công tại `http://localhost:8501` | chưa deploy thành link public nên người khác chưa thể mở trực tiếp |
+| UI | `app.py` + link Streamlit public | UI đã deploy tại `https://ngohuyhoang-research-agent.streamlit.app` và có thể mở trực tiếp | API bên ngoài vẫn phụ thuộc quota/balance và độ ổn định của từng provider |
 | Tool unit tests (`tests/`) | `pytest` output | 84 passed, 0 failed, 0 skipped; trong đó có 3 test cho `inspect_source` | test chỉ chạy offline bằng mock nên không xác nhận được độ ổn định của API thật |
 
 
@@ -108,7 +113,7 @@ Research agent của em có thể tìm tin trên web hoặc mạng xã hội, đ
 - Mô tả tool, lúc nào dùng/không dùng và convention của từng argument thuộc về `tools.yaml`. Em thấy tách như vậy dễ sửa hơn là nhồi tất cả vào một prompt dài.
 - Run v3 đầu tiên có 19/19 case đo được nhưng M06 timeout. Metric tự động ghi accuracy 1.0 nếu chỉ nhìn measured cases, nên chỗ này bắt buộc phải review `provider_error_cases`; em đã chạy lại để lấy đủ 20/20 thay vì dùng con số đẹp nhưng thiếu một case.
 - Live chat turn 3 có hành vi đúng về mặt người dùng nhưng model trả câu hỏi trực tiếp thay vì gọi structured tool `clarify`. Eval base dùng `tool_choice=required` nên không bộc lộ khác biệt này; đây là điểm em phải đọc transcript thủ công mới thấy.
-- Nếu làm tiếp, em sẽ deploy UI thành link public và thêm cơ chế quan sát token/cost theo từng run. Em cũng muốn test thêm case khó ngoài dữ liệu hiện tại để kiểm tra agent có thực sự tổng quát hay chỉ đang hợp với bộ eval này.
+- UI đã được deploy thành link public. Nếu làm tiếp, em sẽ thêm cơ chế quan sát token/cost theo từng run và test thêm case khó ngoài dữ liệu hiện tại để kiểm tra agent có thực sự tổng quát hay chỉ đang hợp với bộ eval này.
 
 ## B7. Small Local Model Challenge (bonus)
 
