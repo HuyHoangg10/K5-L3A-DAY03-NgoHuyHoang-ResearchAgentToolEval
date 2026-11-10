@@ -3,5 +3,106 @@
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+    {
+      "id": "G01_inspect_source_url",
+      "phase": "B",
+      "query": "Kiểm tra sơ bộ link này có dấu hiệu gì cần lưu ý: https://arxiv.org/abs/1706.03762",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "inspect_source", "args": {"url": "https://arxiv.org/abs/1706.03762"}}]},
+      "metadata": {"what_it_tests": "Route yêu cầu kiểm tra cấu trúc URL sang tool mới inspect_source thay vì fetch."}
+    },
+    {
+      "id": "G02_search_papers",
+      "phase": "B",
+      "query": "Tìm 3 paper arXiv về RAG evaluation",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "papers", "args": {"query": "RAG evaluation", "max_results": 3}}]},
+      "metadata": {"what_it_tests": "Phân biệt tìm paper theo chủ đề với đọc paper đã có ID."}
+    },
+    {
+      "id": "G03_policy_source_citation",
+      "phase": "B",
+      "query": "Tìm trong policy nội bộ quy định về trích dẫn nguồn",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "policy", "args": {"query": "trích dẫn nguồn", "policy_area": "source_citation"}}]},
+      "metadata": {"what_it_tests": "Route sang local policy và chọn đúng policy_area."}
+    },
+    {
+      "id": "G04_missing_source_url",
+      "phase": "B",
+      "query": "Kiểm tra giúp mình nguồn này có dấu hiệu gì đáng lưu ý",
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "text"}}]},
+      "metadata": {"what_it_tests": "Tool mới cần URL nhưng user chưa cung cấp nên phải hỏi lại."}
+    },
+    {
+      "id": "G05_top_social_posts",
+      "phase": "B",
+      "query": "Tìm 7 tweet phổ biến nhất về AI agents",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {"query": "AI agents", "search_type": "Top", "limit": 7}}]},
+      "metadata": {"what_it_tests": "Giữ đúng query, số lượng và map phổ biến nhất sang Top."}
+    },
+    {
+      "id": "G06_multiturn_topic_and_time_correction",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Tìm tin AI trong tuần này"},
+        {"role": "user", "content": "Đổi chủ đề sang robotics"},
+        {"role": "user", "content": "Và chỉ lấy tin hôm nay thôi"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "lookup", "args": {"query": "robotics", "topic": "news", "timeframe": "day"}}]},
+      "metadata": {"what_it_tests": "Carry news intent nhưng cập nhật cả topic và timeframe theo correction mới nhất."}
+    },
+    {
+      "id": "G07_multiturn_switch_timeline_to_search",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Lấy tweet mới nhất của Sam Altman"},
+        {"role": "user", "content": "Thôi không lấy của riêng ai nữa"},
+        {"role": "user", "content": "Tìm các tweet phổ biến về OpenAI nhé"}
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {"query": "OpenAI", "search_type": "Top"}}]},
+      "metadata": {"what_it_tests": "Latest correction đổi từ timeline một account sang tìm chung theo chủ đề."}
+    },
+    {
+      "id": "G08_multiturn_fill_source_url",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Kiểm tra sơ bộ nguồn này giúp mình"},
+        {"role": "user", "content": "https://example.edu/research/ai"},
+        {"role": "user", "content": "Chỉ kiểm tra URL, chưa cần đọc nội dung"}
+      ],
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "inspect_source", "args": {"url": "https://example.edu/research/ai"}}]},
+      "metadata": {"what_it_tests": "Sau khi được bổ sung URL phải dùng tool mới, không fetch nội dung."}
+    },
+    {
+      "id": "G09_multiturn_paper_query_correction",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Tìm 5 paper về LLM"},
+        {"role": "user", "content": "Đổi sang RAG evaluation"},
+        {"role": "user", "content": "Chỉ cần 2 paper thôi"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "papers", "args": {"query": "RAG evaluation", "max_results": 2}}]},
+      "metadata": {"what_it_tests": "Cập nhật query và limit qua nhiều lượt cho paper search."}
+    },
+    {
+      "id": "G10_multiturn_confirm_before_send",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Bản tin hôm nay: AI agent đang được ứng dụng nhiều hơn trong doanh nghiệp."},
+        {"role": "user", "content": "Giữ nguyên câu đó"},
+        {"role": "user", "content": "Đăng bản tin lên Telegram giúp mình"}
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "yes_no"}}]},
+      "metadata": {"what_it_tests": "Có sẵn nội dung nhưng chưa xác nhận hành động gửi nên vẫn phải hỏi yes/no."}
+    }
+  ]
 }

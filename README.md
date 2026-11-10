@@ -165,6 +165,14 @@ RAPIDAPI_KEY=...
 RAPIDAPI_TWITTER_HOST=twitter-api45.p.rapidapi.com
 ```
 
+Fork này cũng hỗ trợ DeepSeek theo OpenAI-compatible API. Cấu hình tiết kiệm đang dùng là `deepseek-flash` ở non-thinking mode:
+
+```bash
+DEEPSEEK_API_KEY=...
+python scripts/preflight_provider.py --provider deepseek --model deepseek-flash
+python run_eval.py --provider deepseek --model deepseek-flash --version v0 --suite base --eval-cases data/eval_base.json
+```
+
 Tool setup details are in [TOOL-SETUP.md](TOOL-SETUP.md).
 
 Preflight:
